@@ -30,6 +30,6 @@ setup(name='mongolock',
       zip_safe=False,
       tests_require=['pytest>=2.6.0'],
       install_requires=[
-          "mongodb>=2.4.2",
+          "pymongo>=2.6.0",
       ]
 )
