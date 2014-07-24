@@ -57,7 +57,7 @@ Consider following sequence:
   * worker1 achieve lock with expire +30s
   * worker2 try to get lock after 30s (worker1 still working)
   * as lock expires, worker2 steal it
-  * now worker1 ands his work and releases lock, as they has same names - lock released
+  * now worker1 ends his work and releases lock, as they has same names - lock released
   * worker3 takes a lock, while worker2 still working ...
 
 #### Lock simply not works
