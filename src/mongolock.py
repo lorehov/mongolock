@@ -89,8 +89,6 @@ class MongoLock(object):
             {'_id': key, 'owner': owner},
             {'locked': False, 'owner': None, 'created': None, 'expire': None}
         )
-        if not status or not status['locked']:
-            raise MongoLockException('Trying to release a unlocked lock')
 
     def get_lock_info(self, key):
         """Get lock status

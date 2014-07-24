@@ -38,13 +38,12 @@ def test_release(lock):
 
 def test_should_not_release_not_lock_owned_by_another_one(lock):
     lock.lock('key', 'another_one')
-    with pytest.raises(MongoLockException):
-        lock.release('key', 'owner')
+    assert lock.get_lock_info('key')['locked']
 
 
 def test_should_not_release_not_locked_lock(lock):
-    with pytest.raises(MongoLockException):
-        lock.release('key', 'owner')
+    lock.release('key', 'owner')
+    assert lock.get_lock_info('key') is None
 
 
 def test_context(lock):
