@@ -1,4 +1,4 @@
-__version__ = '1.0'
+__version__ = '1.0.1'
 
 import os
 import sys
@@ -45,6 +45,7 @@ setup(
     author_email="lev.orekhov@gmail.com",
     url="https://github.com/lorehov/mongolock",
     license="BSD",
+    package_dir={'': 'src'},
     py_modules=['mongolock'],
     cmdclass={'test': PyTest},
     test_suite="test_mongolock",
