@@ -1,7 +1,5 @@
-Usage
-_____
+# Usage
 
-::
     from mongolock import MongoLock
 
     lock = MongoLock()
@@ -23,7 +21,6 @@ _____
        # some loong loong work here
        lock.touch('key', 'my_worker_name')
 
-
 Parameters in `lock` method:
 
   * `key` - name of task to lock
@@ -31,18 +28,14 @@ Parameters in `lock` method:
   * `expire` (optional) - duration in seconds after which lock can be stealed
   * `timeout` (optional) - how long we can wait for a lock (in seconds)
 
-Configuration nuances
-_____________________
+# Configuration nuances
 
 You can configure connection either by specifying connection string,
 
-::
     lock = MongoLock('localhost:27017')
-
 
 or by passing configured instance of MongoClient/MongoReplicaSetClient in MongoLock constructor:
 
-::
     client = MongoClient('localhost:27017')
     lock = MongoLock(client=client)
 
@@ -53,11 +46,9 @@ The second is preferred, as in such a way you can perform more fine grained conf
   * specify tags
   * etc
 
-Important things to think about
-_______________________________
+# Important things to think about
 
-Lock stealing and releasing
-
+#### Lock stealing and releasing
 
 You should use unique names for all your workers, if you don't - some strange things may happens.
 Consider following sequence:
