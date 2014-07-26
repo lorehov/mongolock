@@ -68,15 +68,12 @@ class MongoLock(object):
             })
             return True
         except DuplicateKeyError:
-            if not timeout:
-                return False
-
             start_time = datetime.utcnow()
             while True:
-                if self._try_get_lock(key, owner, expire) is not None:
+                if self._try_get_lock(key, owner, expire):
                     return True
 
-                if datetime.utcnow() >= start_time + timedelta(seconds=timeout):
+                if not timeout or datetime.utcnow() >= start_time + timedelta(seconds=timeout):
                     return False
 
     def release(self, key, owner):

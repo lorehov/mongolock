@@ -19,8 +19,14 @@ def test_locked_successfully(lock):
     assert lock.lock('key', 'owner')
 
 
-def test_lock_already_locked(lock):
+def test_locked_successfully_second_time(lock):
+    lock.lock('key', 'owner')
+    lock.release('key', 'owner')
     assert lock.lock('key', 'owner')
+
+
+def test_lock_already_locked(lock):
+    assert lock.lock('key', 'another_one')
     assert lock.lock('key', 'owner') is False
 
 
