@@ -3,6 +3,7 @@ from datetime import datetime, timedelta
 
 from pymongo import MongoClient
 from pymongo.errors import DuplicateKeyError
+from pymongo.collection import Collection
 
 
 class MongoLockException(Exception):
@@ -22,20 +23,23 @@ class MongoLock(object):
         :Parameters:
           - `host` (optional) - use it to manually specify mongodb connection string
           - `db` (optional) - db name
-          - `collection` (optional) - collection name
+          - `collection` (optional) - collection name or pymongo.Collection instance
           - `client` - instance of :class:`MongoClient` ot :class:`MongoReplicaSetClient`,
              if specified - `host` parameter will be skipped
         """
-        if client:
-            self.client = client
+
+        if isinstance(collection, Collection):
+            self.collection = collection
         else:
-            self.client = MongoClient(host)
-        self.collection = self.client[db][collection]
+            if client:
+                self.client = client
+            else:
+                self.client = MongoClient(host)
+            self.collection = self.client[db][collection]
 
     @contextlib.contextmanager
     def __call__(self, key, owner, timeout=None, expire=None):
-        """See `lock` method.
-        """
+        """See `lock` method. """
         if not self.lock(key, owner, timeout, expire):
             status = self.get_lock_info(key)
             raise MongoLockLocked(
@@ -51,9 +55,9 @@ class MongoLock(object):
 
         :Parameters:
           - `key` - lock name
-          - `owner` - name of application/component/whatever, which ask for lock
-          - `timeout` (optional) - how long to wait, if `key` is locked
-          - `expire` (optional) - when given, lock will be released, after that number of seconds.
+          - `owner` - name of application/component/whatever which asks for lock
+          - `timeout` (optional) - how long to wait if `key` is locked
+          - `expire` (optional) - when given, lock will be released after that number of seconds.
 
         Raises `MongoLockTimeout` if can't achieve a lock before timeout.
         """
@@ -79,7 +83,7 @@ class MongoLock(object):
     def release(self, key, owner):
         """Release lock with given name.
           `key` - lock name
-          `owner` - name of application/component/whatever, which held a lock
+          `owner` - name of application/component/whatever which held a lock
         Raises `MongoLockException` if no such a lock.
         """
         status = self.collection.find_and_modify(
@@ -88,13 +92,11 @@ class MongoLock(object):
         )
 
     def get_lock_info(self, key):
-        """Get lock status
-        """
+        """Get lock status. """
         return self.collection.find_one({'_id': key})
 
     def touch(self, key, owner):
-        """Renew lock, to avoid expiration.
-        """
+        """Renew lock to avoid expiration. """
         lock = self.collection.find_one({'_id': key, 'owner': owner})
         if not lock:
             raise MongoLockException(u'Can\'t find lock for {key}: {owner}'.format(key=key, owner=owner))
@@ -122,6 +124,4 @@ class MongoLock(object):
                 'expire': expire
             }
         )
-        if result['n'] > 1:
-            raise MongoLockException(u'More then one lock affected for {key}, {expire}!'.format(key=key, expire=dtnow))
         return True if result['n'] == 1 else False

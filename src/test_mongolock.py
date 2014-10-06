@@ -86,3 +86,9 @@ def touch_expired_not_specified(lock):
     lock.lock('key', 'owner', expire=1)
     lock.touch('key', 'owner')
     assert lock.get_lock_info('key')['expire'] is None
+
+
+def test_create_lock_by_collection():
+    connection[db_name][col_name].remove()
+    collection = connection[db_name][col_name]
+    assert MongoLock(collection=collection).lock('key', 'owner')
