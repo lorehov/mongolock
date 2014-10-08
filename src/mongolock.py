@@ -1,3 +1,4 @@
+import time
 import contextlib
 from datetime import datetime, timedelta
 
@@ -15,19 +16,18 @@ class MongoLockLocked(Exception):
 
 
 class MongoLock(object):
-    DEFAULT_SLEEP_STEP = 0.1
-
-    def __init__(self, host='localhost', db='mongolock', collection='lock', client=None):
+    def __init__(self, host='localhost', db='mongolock', collection='lock', client=None, acquire_retry_step=0.1):
         """Create a new instance of MongoLock.
 
         :Parameters:
           - `host` (optional) - use it to manually specify mongodb connection string
           - `db` (optional) - db name
-          - `collection` (optional) - collection name or pymongo.Collection instance
-          - `client` - instance of :class:`MongoClient` ot :class:`MongoReplicaSetClient`,
+          - `collection` (optional) - collection name or :class:`pymongo.Collection` instance
+          - `client` - instance of :class:`MongoClient` or :class:`MongoReplicaSetClient`,
+          - `acquire_retry_step` (optional)- time in seconds between retries while trying to acquire the lock,
              if specified - `host` parameter will be skipped
         """
-
+        self.acquire_retry_step = acquire_retry_step
         if isinstance(collection, Collection):
             self.collection = collection
         else:
@@ -79,6 +79,7 @@ class MongoLock(object):
 
                 if not timeout or datetime.utcnow() >= start_time + timedelta(seconds=timeout):
                     return False
+                time.sleep(self.acquire_retry_step)
 
     def release(self, key, owner):
         """Release lock with given name.
