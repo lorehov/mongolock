@@ -1,6 +1,8 @@
-from datetime import datetime
+from datetime import datetime, timedelta
+
 import pytest
 from pymongo import MongoClient
+
 from mongolock import MongoLock, MongoLockLocked, MongoLockException
 
 
@@ -92,3 +94,21 @@ def test_create_lock_by_collection():
     connection[db_name][col_name].remove()
     collection = connection[db_name][col_name]
     assert MongoLock(collection=collection).lock('key', 'owner')
+
+
+@pytest.mark.parametrize("locked, expire, is_locked", [
+    (None, None, False),
+    (True, None, True),
+    (True, datetime.utcnow() - timedelta(seconds=1), False),
+    (True, datetime.utcnow() + timedelta(seconds=1), True)
+])
+def test_is_locked(lock, locked, expire, is_locked):
+    if locked is not None:
+        connection[db_name][col_name].insert({
+            '_id': 'key',
+            'locked': locked,
+            'owner': 'owner',
+            'created': datetime.utcnow(),
+            'expire': expire
+        })
+    assert lock.is_locked('key') == is_locked

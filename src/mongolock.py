@@ -96,6 +96,14 @@ class MongoLock(object):
         """Get lock status. """
         return self.collection.find_one({'_id': key})
 
+    def is_locked(self, key):
+        lock_info = self.get_lock_info(key)
+        return not (
+            not lock_info 
+            or not lock_info['locked'] 
+            or (lock_info['expire'] is not None and lock_info['expire'] < datetime.utcnow())
+        )
+
     def touch(self, key, owner):
         """Renew lock to avoid expiration. """
         lock = self.collection.find_one({'_id': key, 'owner': owner})
