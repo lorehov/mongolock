@@ -47,8 +47,10 @@ class MongoLock(object):
                     owner=status['owner'], ts=status['created'], expire=status['expire']
                 )
             )
-        yield
-        self.release(key, owner)
+        try:
+            yield
+        finally:
+            self.release(key, owner)
 
     def lock(self, key, owner, timeout=None, expire=None):
         """Lock given `key` to `owner`.

@@ -83,6 +83,12 @@ def test_cant_touch_locked_by_another(lock):
     with pytest.raises(MongoLockException):
         lock.touch('key', 'owner')
 
+def test_lock_released_if_exception_raised(lock):
+    try:
+        with lock('key', 'owner'):
+            raise Exception('Crash!')
+    except:
+        assert lock.get_lock_info('key')['locked'] is False
 
 def touch_expired_not_specified(lock):
     lock.lock('key', 'owner', expire=1)
