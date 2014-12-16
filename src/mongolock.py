@@ -27,7 +27,6 @@ class MongoLock(object):
           - `acquire_retry_step` (optional)- time in seconds between retries while trying to acquire the lock,
              if specified - `host` parameter will be skipped
         """
-        self.lock_expire = None
         self.acquire_retry_step = acquire_retry_step
         if isinstance(collection, Collection):
             self.collection = collection
