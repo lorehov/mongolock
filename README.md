@@ -6,7 +6,7 @@
 
     # you can use it as context:
     # (if lock is already taken by another worker, MongoLockLocked will be raised)
-    with lock('key', 'my_worker_name', expires=60, timeout=10):
+    with lock('key', 'my_worker_name', expire=60, timeout=10):
        # some work here
 
     # or simply by calling methods:
@@ -17,7 +17,7 @@
             lock.release('key', 'my_worker_name')
 
     # you can also renew lock by touching it:
-    with lock('key', 'my_worker_name', expires=60, timeout=10):
+    with lock('key', 'my_worker_name', expire=60, timeout=10):
        # some looong looong work here
        lock.touch('key', 'my_worker_name')
 
