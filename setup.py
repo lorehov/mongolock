@@ -1,4 +1,4 @@
-__version__ = '1.3.3'
+__version__ = '1.3.4'
 
 import os
 import sys
@@ -36,6 +36,7 @@ setup(
         'Intended Audience :: Developers',
         'Programming Language :: Python',
         'Programming Language :: Python :: 2',
+        'Programming Language :: Python :: 3',
         'Operating System :: OS Independent',
         'Topic :: Software Development :: Libraries',
         'Topic :: Software Development :: Libraries :: Python Modules',
