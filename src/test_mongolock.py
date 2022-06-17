@@ -13,7 +13,7 @@ col_name = 'locks'
 
 @pytest.fixture()
 def lock():
-    connection[db_name][col_name].remove()
+    connection[db_name][col_name].drop()
     return MongoLock(client=connection, db=db_name, collection=col_name)
 
 
@@ -97,7 +97,7 @@ def touch_expired_not_specified(lock):
 
 
 def test_create_lock_by_collection():
-    connection[db_name][col_name].remove()
+    connection[db_name][col_name].drop()
     collection = connection[db_name][col_name]
     assert MongoLock(collection=collection).lock('key', 'owner')
 
@@ -110,7 +110,7 @@ def test_create_lock_by_collection():
 ])
 def test_is_locked(lock, locked, expire, is_locked):
     if locked is not None:
-        connection[db_name][col_name].insert({
+        connection[db_name][col_name].insert_one({
             '_id': 'key',
             'locked': locked,
             'owner': 'owner',

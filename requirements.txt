@@ -1,2 +1,2 @@
-pymongo>=2.6
+pymongo>=4.1.1
 pytest
