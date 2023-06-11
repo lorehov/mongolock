@@ -1,2 +1,2 @@
-pymongo>=2.6
-pytest
+dnspython>=2.3.0
+pymongo>=4.1.1
