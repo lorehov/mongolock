@@ -65,7 +65,7 @@ class MongoLock(object):
         """
         expire = datetime.utcnow() + timedelta(seconds=expire) if expire else None
         try:
-            self.collection.insert({
+            self.collection.insert_one({
                 '_id': key,
                 'locked': True,
                 'owner': owner,
@@ -89,9 +89,9 @@ class MongoLock(object):
           `owner` - name of application/component/whatever which held a lock
         Raises `MongoLockException` if no such a lock.
         """
-        status = self.collection.find_and_modify(
+        status = self.collection.find_one_and_update(
             {'_id': key, 'owner': owner},
-            {'locked': False, 'owner': None, 'created': None, 'expire': None}
+            {'$set': {'locked': False, 'owner': None, 'created': None, 'expire': None}}
         )
 
     def get_lock_info(self, key):
@@ -116,14 +116,14 @@ class MongoLock(object):
         if not expire:
             raise MongoLockException(u'Can\'t touch lock without expire for {0}: {1}'.format(key, owner))
         expire = datetime.utcnow() + timedelta(seconds=expire)
-        self.collection.update(
+        self.collection.update_one(
             {'_id': key, 'owner': owner},
             {'$set': {'expire': expire}}
         )
 
     def _try_get_lock(self, key, owner, expire):
         dtnow = datetime.utcnow()
-        result = self.collection.update(
+        result = self.collection.update_one(
             {
                 '$or': [
                     {'_id': key, 'locked': False},
@@ -131,10 +131,12 @@ class MongoLock(object):
                 ]
             },
             {
+              '$set': {
                 'locked': True,
                 'owner': owner,
                 'created': dtnow,
                 'expire': expire
+              }
             }
         )
-        return True if result['n'] == 1 else False
+        return True if result.modified_count == 1 else False

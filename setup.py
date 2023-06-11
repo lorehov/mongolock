@@ -1,24 +1,23 @@
 __version__ = '1.3.4'
 
-import os
 import sys
 
+from pathlib import Path
 from setuptools import setup
-from setuptools.command.test import test as TestCommand
+from setuptools.command.test import test as test_command
 
-here = os.path.abspath(os.path.dirname(__file__))
-README = open(os.path.join(here, 'README.md')).read()
+README = (Path(__file__).parent / "README.md").read_text()
 
 
-class PyTest(TestCommand):
+class PyTest(test_command):
     user_options = [('pytest-args=', 'a', "Arguments to pass to py.test")]
 
     def initialize_options(self):
-        TestCommand.initialize_options(self)
+        test_command.initialize_options(self)
         self.pytest_args = ['src/test_mongolock.py']
 
     def finalize_options(self):
-        TestCommand.finalize_options(self)
+        test_command.finalize_options(self)
         self.test_args = []
         self.test_suite = True
 
@@ -27,16 +26,25 @@ class PyTest(TestCommand):
         errno = pytest.main(self.pytest_args)
         sys.exit(errno)
 
+
 setup(
     name='mongolock',
     version=__version__,
     description='Python Mongodb based Distributed Lock',
     long_description=README,
+    long_description_content_type='text/markdown; charset=UTF-8',
     classifiers=[
         'Intended Audience :: Developers',
         'Programming Language :: Python',
-        'Programming Language :: Python :: 2',
         'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3 :: Only',
+        'Programming Language :: Python :: 3.7',
+        'Programming Language :: Python :: 3.8',
+        'Programming Language :: Python :: 3.9',
+        'Programming Language :: Python :: 3.10',
+        'Programming Language :: Python :: 3.11',
+        'Programming Language :: Python :: Implementation :: CPython',
+        'Programming Language :: Python :: Implementation :: PyPy',
         'Operating System :: OS Independent',
         'Topic :: Software Development :: Libraries',
         'Topic :: Software Development :: Libraries :: Python Modules',
@@ -52,6 +60,7 @@ setup(
     test_suite="test_mongolock",
     include_package_data=True,
     zip_safe=False,
-    tests_require=['pytest>=2.6.0'],
-    install_requires=["pymongo>=2.6.0"]
+    python_requires=">=3.7,<4.0",
+    extras_require={"test": ["pytest>=6"]},
+    install_requires=["dnspython>=2.3.0", "pymongo>=4.1.1"]
 )

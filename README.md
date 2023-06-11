@@ -73,3 +73,25 @@ If you use cron (or some analogue) to launch tasks on different machines, take i
   * it takes a lock on TaskA (without problem as lock was released 4s before) and do it
 
 To prevent such a weird situation, you can simply add some part of time (for example YmdHM) to a key with task name.
+
+# Development
+
+#### Run tests
+
+    # Clone sources and change to new directory
+    git clone https://github.com/lorehov/mongolock.git && cd mongolock
+    # Create a new Python 3.7+ environment named `env` and activate it
+    python3 -m venv env && source $_/bin/activate
+    # Install all required packages including test dependencies 
+    pip install -e '.[test]'
+    # Start a local mongo container and remove it automatically after it stopped 
+    docker run --name mongodb --publish 127.0.0.1:27017:27017/tcp -d --rm mongo:6
+    # Run all tests and, if successful, remove mongo and environment
+    pytest && docker stop mongodb && deactivate && rm -r env/
+    
+# Changelog
+
+## x.y.z (2023-mm-dd)
+
+### Features
+* Update pymongo to >=4.1.1
